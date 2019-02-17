@@ -14,6 +14,10 @@
 		E79DD61A221A17720009DFB9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E79DD618221A17720009DFB9 /* LaunchScreen.storyboard */; };
 		E79DD625221A17720009DFB9 /* HydrantsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD624221A17720009DFB9 /* HydrantsTests.swift */; };
 		E79DD630221A17720009DFB9 /* HydrantsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD62F221A17720009DFB9 /* HydrantsUITests.swift */; };
+		E79DD63E221A19220009DFB9 /* HydrantUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD63D221A19220009DFB9 /* HydrantUpdate.swift */; };
+		E79DD640221A19950009DFB9 /* HydrantStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD63F221A19950009DFB9 /* HydrantStore.swift */; };
+		E79DD643221A19D60009DFB9 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E79DD642221A19D60009DFB9 /* MapKit.framework */; };
+		E79DD645221A22DF0009DFB9 /* HydrantMapAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD644221A22DF0009DFB9 /* HydrantMapAnnotation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +51,10 @@
 		E79DD62B221A17720009DFB9 /* HydrantsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HydrantsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E79DD62F221A17720009DFB9 /* HydrantsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HydrantsUITests.swift; sourceTree = "<group>"; };
 		E79DD631221A17720009DFB9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E79DD63D221A19220009DFB9 /* HydrantUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HydrantUpdate.swift; sourceTree = "<group>"; };
+		E79DD63F221A19950009DFB9 /* HydrantStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HydrantStore.swift; sourceTree = "<group>"; };
+		E79DD642221A19D60009DFB9 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		E79DD644221A22DF0009DFB9 /* HydrantMapAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HydrantMapAnnotation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E79DD643221A19D60009DFB9 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +90,7 @@
 				E79DD623221A17720009DFB9 /* HydrantsTests */,
 				E79DD62E221A17720009DFB9 /* HydrantsUITests */,
 				E79DD60D221A17680009DFB9 /* Products */,
+				E79DD641221A19D50009DFB9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -103,6 +113,9 @@
 				E79DD616221A17720009DFB9 /* Assets.xcassets */,
 				E79DD618221A17720009DFB9 /* LaunchScreen.storyboard */,
 				E79DD61B221A17720009DFB9 /* Info.plist */,
+				E79DD63D221A19220009DFB9 /* HydrantUpdate.swift */,
+				E79DD63F221A19950009DFB9 /* HydrantStore.swift */,
+				E79DD644221A22DF0009DFB9 /* HydrantMapAnnotation.swift */,
 			);
 			path = Hydrants;
 			sourceTree = "<group>";
@@ -123,6 +136,14 @@
 				E79DD631221A17720009DFB9 /* Info.plist */,
 			);
 			path = HydrantsUITests;
+			sourceTree = "<group>";
+		};
+		E79DD641221A19D50009DFB9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E79DD642221A19D60009DFB9 /* MapKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -256,6 +277,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E79DD640221A19950009DFB9 /* HydrantStore.swift in Sources */,
+				E79DD645221A22DF0009DFB9 /* HydrantMapAnnotation.swift in Sources */,
+				E79DD63E221A19220009DFB9 /* HydrantUpdate.swift in Sources */,
 				E79DD612221A17680009DFB9 /* ViewController.swift in Sources */,
 				E79DD610221A17680009DFB9 /* AppDelegate.swift in Sources */,
 			);
