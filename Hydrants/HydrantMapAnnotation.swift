@@ -11,9 +11,17 @@ import MapKit
 
 class HydrantAnnotation: NSObject, MKAnnotation {
     
+    let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+        return dateFormatter
+    }()
+    
+    
     var coordinate: CLLocationCoordinate2D
     var title: String? {
-        return "\(hydrant.comment)"
+        return "\(dateFormatter.string(from: hydrant.date)). \(hydrant.comment ?? "")"
     }
     
     let hydrant: HydrantUpdate

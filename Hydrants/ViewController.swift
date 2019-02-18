@@ -20,30 +20,32 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         locationManager = CLLocationManager()
         locationManager!.delegate = self
         locationManager!.requestWhenInUseAuthorization()
         hydrantMap!.delegate = self
-        // show all hydrants on map
         
         addAnnotations()
     
     }
     
     func addAnnotations() {
-        
         for hydrant in hydrantList! {
             let annotation = HydrantAnnotation(hydrant: hydrant)
-            //annotation.coordinate = hydrant.coordinates
-            print("adding coordinate")
-            print(hydrant)
             hydrantMap.addAnnotation(annotation)
         }
-        
     }
 
+    
+    func imageWith(image: UIImage, newSize: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        let resizedImage = renderer.image { context in
+            image.draw(in: CGRect.init(origin: CGPoint.zero, size: newSize))
+        }
+        return resizedImage
+    }
+    
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
@@ -54,12 +56,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             pinAnnotation.annotation = hAnnotation
             pinAnnotation.canShowCallout = true
             
-            //let photoView = UIImageView(image: UIImage(named: "test_1"))
             let image = imageStore?.image(forKey: hAnnotation.hydrant.imageKey)
-            let photoView = UIImageView(image: image )
+          
             
+            //let frame = CGRect(x: 0, y: 0, width: 200, height: 700)
+
+         
+            let photoView = UIImageView()
             photoView.contentMode = .scaleAspectFit
+            photoView.clipsToBounds = true
+           // photoView.contentScaleFactor = 0.4
+            photoView.image = image
+            let heightConstraint = NSLayoutConstraint(item: photoView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 200)
+            photoView.addConstraint(heightConstraint)
+
+            
+           // viewFrame.addSubview(photoView)
+            
+           // photoView.contentMode = .scaleAspectFit
             pinAnnotation.detailCalloutAccessoryView = photoView
+          photoView.sizeToFit()
+         //UIView.AutoresizingMask.flexibleHeight
         
             return pinAnnotation
         }
@@ -99,21 +116,48 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         
         let image = info[.originalImage] as! UIImage
 
+        picker.dismiss(animated: true, completion: nil)
+
         
         // get comment
         
-        let comment = "DSGDFG"
-        let hydrantUpdate = HydrantUpdate(coordinate: (locationManager?.location?.coordinate)!, comment: comment)
+        let alertController = UIAlertController(title: "Enter Comments", message: nil, preferredStyle: .alert)
         
-        imageStore!.setImage(image, forKey: hydrantUpdate.imageKey)
+        alertController.addTextField { textField in
+            textField.placeholder = "Add optional comment"
+        }
         
-        //update map
         
-        let annotation = HydrantAnnotation(hydrant: hydrantUpdate)
-        hydrantMap.addAnnotation(annotation)
-        // new Hydrant object
-    
-        picker.dismiss(animated: true, completion: nil)
+        let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
+
+            
+            let comment = alertController.textFields!.first?.text
+            
+            let hydrantUpdate = HydrantUpdate(coordinate: (self.locationManager?.location?.coordinate)!, comment: comment)
+            
+            
+            self.imageStore!.setImage(image, forKey: hydrantUpdate.imageKey)
+            
+            //update map
+            
+            let annotation = HydrantAnnotation(hydrant: hydrantUpdate)
+            self.hydrantMap.addAnnotation(annotation)
+            // new Hydrant object
+            
+          
+
+            }
+
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default) { _ in
+         //       picker.dismiss(animated: true, completion: nil)
+        }
+        
+        alertController.addAction(saveAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true)
+        
+        
     }
     
     
