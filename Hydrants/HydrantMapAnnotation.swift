@@ -19,7 +19,7 @@ class HydrantAnnotation: NSObject, MKAnnotation {
     let hydrant: HydrantUpdate
     
     init(hydrant: HydrantUpdate) {
-        self.coordinate = hydrant.coordinates
+        self.coordinate = hydrant.coordinate
         self.hydrant = hydrant
     }
     

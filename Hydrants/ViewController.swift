@@ -12,6 +12,7 @@ import MapKit
 class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
 
     var hydrantList: [HydrantUpdate]?
+    var imageStore: ImageStore?
     
     var locationManager: CLLocationManager?
     
@@ -47,15 +48,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
         if annotation is HydrantAnnotation {
+            
+            let hAnnotation = annotation as! HydrantAnnotation
             let pinAnnotation = MKPinAnnotationView()
-            pinAnnotation.annotation = annotation
+            pinAnnotation.annotation = hAnnotation
             pinAnnotation.canShowCallout = true
             
-            let photoView = UIImageView(image: UIImage(named: "test_1"))
-            photoView.sizeToFit()
-            pinAnnotation.detailCalloutAccessoryView = photoView
+            //let photoView = UIImageView(image: UIImage(named: "test_1"))
+            let image = imageStore?.image(forKey: hAnnotation.hydrant.imageKey)
+            let photoView = UIImageView(image: image )
             
-
+            photoView.contentMode = .scaleAspectFit
+            pinAnnotation.detailCalloutAccessoryView = photoView
+        
             return pinAnnotation
         }
         
@@ -75,6 +80,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         locationManager!.requestLocation()
         
         let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
         
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             imagePicker.sourceType = .camera
@@ -90,12 +96,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
-        let image = info[.originalImage]
         
+        let image = info[.originalImage] as! UIImage
+
+        
+        // get comment
+        
+        let comment = "DSGDFG"
+        let hydrantUpdate = HydrantUpdate(coordinate: (locationManager?.location?.coordinate)!, comment: comment)
+        
+        imageStore!.setImage(image, forKey: hydrantUpdate.imageKey)
+        
+        //update map
+        
+        let annotation = HydrantAnnotation(hydrant: hydrantUpdate)
+        hydrantMap.addAnnotation(annotation)
         // new Hydrant object
-        
-        
-        
+    
+        picker.dismiss(animated: true, completion: nil)
     }
     
     
@@ -103,6 +121,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         if status == .authorizedWhenInUse {
             hydrantMap.showsUserLocation = true
             locationManager!.requestLocation()
+            locationManager?.startUpdatingLocation()  // update as app runs
         } else {
             let alert = UIAlertController(title: "Can't display location", message: "Please grant permission in settings", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK",

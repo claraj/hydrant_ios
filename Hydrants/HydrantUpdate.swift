@@ -10,13 +10,36 @@ import Foundation
 import MapKit
 
 
-struct HydrantUpdate {
+class HydrantUpdate: NSObject, NSCoding  {
     
-    let key = UUID().uuidString
-    let imageTag: String
+    let imageKey: String
     let date: Date
-    let coordinates: CLLocationCoordinate2D
+    let coordinate: CLLocationCoordinate2D
     var comment: String?
+    
+    init(coordinate: CLLocationCoordinate2D, comment: String?)  {
+        
+        self.comment =  comment
+        self.coordinate = coordinate
+        self.imageKey = UUID().uuidString
+        self.date = Date()
+    }
+    
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(imageKey, forKey: "imageKey")
+        aCoder.encode(date, forKey: "date")
+        aCoder.encode(coordinate, forKey: "coordinate")
+        aCoder.encode(comment, forKey: "comment")
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        imageKey = aDecoder.decodeObject(forKey: "imageKey") as! String
+        date = aDecoder.decodeObject(forKey: "date") as! Date
+        coordinate = aDecoder.decodeObject(forKey: "coordinate") as! CLLocationCoordinate2D
+        comment = aDecoder.decodeObject(forKey: "comment") as? String  // ok to be nil
+        
+    }
+    
     
     
     

@@ -21,7 +21,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let viewController = window?.rootViewController as! ViewController
         let hydrantList = HydrantStore()
+        let imageStore = ImageStore()
+        
         viewController.hydrantList = hydrantList.hydrantUpdates
+        viewController.imageStore = imageStore
         
         return true
     }

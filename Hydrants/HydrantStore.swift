@@ -16,10 +16,10 @@ class HydrantStore {
     init() {
         hydrantUpdates = []
         
-        let test1 = HydrantUpdate(imageTag: "123456789", date: Date(), coordinates:
+        let test1 = HydrantUpdate(coordinate:
             CLLocationCoordinate2DMake(45, -93), comment: "Snow gone")
         
-        let test2 = HydrantUpdate(imageTag: "098765432", date: Date(), coordinates: CLLocationCoordinate2DMake(45.1, -93.1), comment: "Cleared snow")
+        let test2 = HydrantUpdate(coordinate: CLLocationCoordinate2DMake(45.1, -93.1), comment: "Cleared snow")
 
         
         hydrantUpdates.append(test2)
