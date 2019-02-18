@@ -18,7 +18,6 @@ class HydrantUpdate: NSObject, NSCoding  {
     var comment: String?
     
     init(coordinate: CLLocationCoordinate2D, comment: String?)  {
-        
         self.comment =  comment
         self.coordinate = coordinate
         self.imageKey = UUID().uuidString
@@ -28,14 +27,19 @@ class HydrantUpdate: NSObject, NSCoding  {
     func encode(with aCoder: NSCoder) {
         aCoder.encode(imageKey, forKey: "imageKey")
         aCoder.encode(date, forKey: "date")
-        aCoder.encode(coordinate, forKey: "coordinate")
+        
+        // can't encode structs 
+        aCoder.encode(coordinate.latitude, forKey: "coordinate_latitude")
+        aCoder.encode(coordinate.longitude, forKey: "coordinate_longitude")
         aCoder.encode(comment, forKey: "comment")
     }
     
     required init?(coder aDecoder: NSCoder) {
         imageKey = aDecoder.decodeObject(forKey: "imageKey") as! String
         date = aDecoder.decodeObject(forKey: "date") as! Date
-        coordinate = aDecoder.decodeObject(forKey: "coordinate") as! CLLocationCoordinate2D
+        let latitude = aDecoder.decodeDouble(forKey: "coordinate_latitude")
+        let longitude = aDecoder.decodeDouble(forKey: "coordinate_longitude")
+        coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         comment = aDecoder.decodeObject(forKey: "comment") as? String  // ok to be nil
         
     }
