@@ -11,13 +11,10 @@ import MapKit
 
 class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
 
-    var hydrantStore: HydrantStore?
-    var imageStore: ImageStore?
-    
-    
-    var locationManager: CLLocationManager?
-    
     @IBOutlet var hydrantMap: MKMapView!
+    
+    var hydrantStore: HydrantStore?
+    var locationManager: CLLocationManager?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,63 +24,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         locationManager!.requestWhenInUseAuthorization()
         hydrantMap!.delegate = self
         
-        addAnnotations()
-    
-    }
-    
-    func addAnnotations() {
-        for hydrant in (hydrantStore?.hydrantUpdates)! {
+        for hydrant in hydrantStore!.hydrantUpdates {
             let annotation = HydrantAnnotation(hydrant: hydrant)
             hydrantMap.addAnnotation(annotation)
         }
     }
-
-    
-    func imageWith(image: UIImage, newSize: CGSize) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: newSize)
-        let resizedImage = renderer.image { context in
-            image.draw(in: CGRect.init(origin: CGPoint.zero, size: newSize))
-        }
-        return resizedImage
-    }
-    
-    
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        
-        if annotation is HydrantAnnotation {
-            
-            let hAnnotation = annotation as! HydrantAnnotation
-            let pinAnnotation = MKPinAnnotationView()
-            pinAnnotation.annotation = hAnnotation
-            pinAnnotation.canShowCallout = true
-            
-            let image = imageStore?.image(forKey: hAnnotation.hydrant.imageKey)
-          
-            let photoView = UIImageView()
-            photoView.contentMode = .scaleAspectFit
-            photoView.image = image
-            let heightConstraint = NSLayoutConstraint(item: photoView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 200)
-            photoView.addConstraint(heightConstraint)
-
-            pinAnnotation.detailCalloutAccessoryView = photoView
-      
-            return pinAnnotation
-        }
-        
-        return nil
-        
-    }
-    
-    
     
     @IBAction func addHydrantUpdate(_ sender: Any) {
         
-        // Get user's current location
-        // launch camera (or gallery, on emulator)
-        // Save photo tag and data about hydrant
-        // add to Hydrant list and update map
-        
-        locationManager!.requestLocation()
+        centerMapOnUserLocation()
         
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
@@ -96,19 +45,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         
         imagePicker.delegate = self
         present(imagePicker, animated: true, completion: nil )
-        
     }
-    
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
-        
         let image = info[.originalImage] as! UIImage
-
         picker.dismiss(animated: true, completion: nil)
-
-        
-        // get comment
         
         let alertController = UIAlertController(title: "Enter Comments", message: nil, preferredStyle: .alert)
         
@@ -116,40 +58,53 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             textField.placeholder = "Add optional comment"
         }
         
-        
         let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
-
-            
-            let comment = alertController.textFields!.first?.text
-            
+            let comment = alertController.textFields!.first!.text
             let hydrantUpdate = HydrantUpdate(coordinate: (self.locationManager?.location?.coordinate)!, comment: comment)
-            
-            self.imageStore!.setImage(image, forKey: hydrantUpdate.imageKey)
-            self.hydrantStore?.addHydrantUpdate(hydrant: hydrantUpdate)
-            
-            
+            self.hydrantStore!.addHydrantUpdate(hydrant: hydrantUpdate, image: image)
             let annotation = HydrantAnnotation(hydrant: hydrantUpdate)
             self.hydrantMap.addAnnotation(annotation)
         }
-
-        let cancelAction = UIAlertAction(title: "Cancel", style: .default) { _ in
-         //       picker.dismiss(animated: true, completion: nil)
-        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default)
         
         alertController.addAction(saveAction)
         alertController.addAction(cancelAction)
         
-        present(alertController, animated: true)
-        
-        
+        present(alertController, animated: true )
     }
     
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        if annotation is HydrantAnnotation {
+            
+            let hydrantAnnotation = annotation as! HydrantAnnotation
+            let pinAnnotationView = MKPinAnnotationView()
+            pinAnnotationView.annotation = hydrantAnnotation
+            pinAnnotationView.canShowCallout = true
+            
+            let image = hydrantStore!.getImage(forKey: hydrantAnnotation.hydrant.imageKey)
+            
+            let photoView = UIImageView()
+            photoView.contentMode = .scaleAspectFit
+            photoView.image = image
+            let heightConstraint = NSLayoutConstraint(item: photoView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 200)
+            photoView.addConstraint(heightConstraint)
+            
+            pinAnnotationView.detailCalloutAccessoryView = photoView
+            
+            return pinAnnotationView
+        }
+        
+        return nil
+        
+    }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse {
             hydrantMap.showsUserLocation = true
-            locationManager!.requestLocation()
-            locationManager?.startUpdatingLocation()  // update as app runs
+            locationManager!.startUpdatingLocation()  // update as app runs
         } else {
             let alert = UIAlertController(title: "Can't display location", message: "Please grant permission in settings", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK",
@@ -159,22 +114,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         }
     }
     
-
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Location manager error: \(error)")  // Example: location disabled for device
+    }
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        
-        if let location = locations.first {
+        centerMapOnUserLocation()  // Follow user on map as they move
+    }
+    
+    func centerMapOnUserLocation() {
+        if let location = locationManager!.location {
             hydrantMap.setCenter(location.coordinate, animated: true)
             let region = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 50000, longitudinalMeters: 50000)
             hydrantMap.setRegion(region, animated: true)
+        } else {
+            print("No location available")
         }
-        
     }
-    
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(error)
-    }
-    
-    
 }
-

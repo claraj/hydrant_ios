@@ -7,16 +7,12 @@
 //
 
 import Foundation
-import MapKit
+import UIKit
 
 class HydrantStore {
     
     var hydrantUpdates: [HydrantUpdate] = []
-    
-    func addHydrantUpdate(hydrant: HydrantUpdate) {
-        hydrantUpdates.append(hydrant)
-        saveChanges()
-    }
+    var imageStore: ImageStore
     
     let hydrantArchiveURL: URL = {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
@@ -24,43 +20,36 @@ class HydrantStore {
         return documentDirectory.appendingPathComponent("hydrants.archive")
     }()
     
-//
-//    init() {
-//        hydrantUpdates = []
-    
-//        let test1 = HydrantUpdate(coordinate:
-//            CLLocationCoordinate2DMake(45, -93), comment: "Snow gone")
-//
-//        let test2 = HydrantUpdate(coordinate: CLLocationCoordinate2DMake(45.1, -93.1), comment: "Cleared snow")
-//
-//
-//        hydrantUpdates.append(test2)
-//        hydrantUpdates.append(test1)
-        
-   // }
-    
     init() {
+        imageStore = ImageStore()
+        
         do {
             let data = try Data(contentsOf: hydrantArchiveURL)
             let archivedItems = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [HydrantUpdate]
             hydrantUpdates = archivedItems!
         } catch {
-            print("error unarchiving \(error)")  //  // this is not a problem if it's the first time the app runs
-            
+            print("Error unarchiving: \(error)")
+            // this is not a problem if it's the first time the app runs, most likely no data has been saved
         }
     }
     
-    func saveChanges() -> Bool {
-        print("save changes")
+    func addHydrantUpdate(hydrant: HydrantUpdate, image: UIImage) {
+        hydrantUpdates.append(hydrant)
+        imageStore.setImage(image, forKey: hydrant.imageKey)
+        archiveChanges()
+    }
+    
+    func getImage(forKey: String) -> UIImage? {
+        return imageStore.image(forKey: forKey)
+    }
+    
+    func archiveChanges() {
         do {
             let data = try NSKeyedArchiver.archivedData(withRootObject: hydrantUpdates, requiringSecureCoding: false)
             try data.write(to: hydrantArchiveURL)
-            print("saved items to \(hydrantArchiveURL)")
-            return true
+            print("archived items to \(hydrantArchiveURL)")
         } catch {
-            print(error)
-            return false
+            print("Error archiving items: \(error)")  // TODO handle this error !
         }
     }
-    
 }

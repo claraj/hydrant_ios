@@ -13,19 +13,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    let hydrantStore = HydrantStore()
-    
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        // Inject Hydrant store's list of HydrantUpdate objects
-        
-        let viewController = window?.rootViewController as! ViewController
-        let imageStore = ImageStore()
-        
+        // Inject HydrantStore object
+        let viewController = window!.rootViewController as! ViewController
+        let hydrantStore = HydrantStore()
         viewController.hydrantStore = hydrantStore
-        viewController.imageStore = imageStore
         
         return true
     }
@@ -38,11 +32,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-    
-        print("archiving")
-        hydrantStore.saveChanges()
-        
-    
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {

@@ -9,42 +9,40 @@
 import Foundation
 import MapKit
 
-
-class HydrantUpdate: NSObject, NSCoding  {
+class HydrantUpdate: NSObject, NSCoding {
     
+    let coordinate: CLLocationCoordinate2D
     let imageKey: String
     let date: Date
-    let coordinate: CLLocationCoordinate2D
     var comment: String?
     
     init(coordinate: CLLocationCoordinate2D, comment: String?)  {
-        self.comment =  comment
         self.coordinate = coordinate
-        self.imageKey = UUID().uuidString
-        self.date = Date()
+        self.imageKey = UUID().uuidString   // a random, unique string 
+        self.date = Date()  // today's date
+        self.comment = comment
     }
     
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(imageKey, forKey: "imageKey")
-        aCoder.encode(date, forKey: "date")
-        
-        // can't encode structs 
+        // can't encode structs, like 2DLocationCoordinate2D so encode
+        // the latitude and longitude values individually
         aCoder.encode(coordinate.latitude, forKey: "coordinate_latitude")
         aCoder.encode(coordinate.longitude, forKey: "coordinate_longitude")
+        
+        aCoder.encode(imageKey, forKey: "imageKey")
+        aCoder.encode(date, forKey: "date")
         aCoder.encode(comment, forKey: "comment")
     }
     
     required init?(coder aDecoder: NSCoder) {
-        imageKey = aDecoder.decodeObject(forKey: "imageKey") as! String
-        date = aDecoder.decodeObject(forKey: "date") as! Date
+        
+        // Decode parts of coordinate separately. Note decodeDouble method
         let latitude = aDecoder.decodeDouble(forKey: "coordinate_latitude")
         let longitude = aDecoder.decodeDouble(forKey: "coordinate_longitude")
         coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        comment = aDecoder.decodeObject(forKey: "comment") as? String  // ok to be nil
         
+        imageKey = aDecoder.decodeObject(forKey: "imageKey") as! String
+        date = aDecoder.decodeObject(forKey: "date") as! Date
+        comment = aDecoder.decodeObject(forKey: "comment") as? String
     }
-    
-    
-    
-    
 }

@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Hydrants</string>
+	<string>Hydrant locations</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Hydrants</string>
+	<string>Hydrant locations</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
