@@ -77,28 +77,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
+        let reuseIdentifier = "HydrantAnnotation"
+        
         if annotation is HydrantAnnotation {
             
             let hydrantAnnotation = annotation as! HydrantAnnotation
-            let pinAnnotationView = MKPinAnnotationView()
-            pinAnnotationView.annotation = hydrantAnnotation
-            pinAnnotationView.canShowCallout = true
+            let imageKey = hydrantAnnotation.hydrant.imageKey
+            let image = hydrantStore!.getImage(forKey: imageKey)
             
-            let image = hydrantStore!.getImage(forKey: hydrantAnnotation.hydrant.imageKey)
-            
-            let photoView = UIImageView()
-            photoView.contentMode = .scaleAspectFit
-            photoView.image = image
-            let heightConstraint = NSLayoutConstraint(item: photoView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 200)
-            photoView.addConstraint(heightConstraint)
-            
-            pinAnnotationView.detailCalloutAccessoryView = photoView
-            
-            return pinAnnotationView
+            if let dequeuedAnnotation = mapView.dequeueReusableAnnotationView(withIdentifier: reuseIdentifier) {
+                let hydrantAnnotationView = dequeuedAnnotation as! HydrantAnnotationView
+                hydrantAnnotationView.annotation = annotation
+                hydrantAnnotationView.setPhoto(hydrantImage: image!)
+                return hydrantAnnotationView
+            } else {
+                
+                let hydrantAnnotationView = HydrantAnnotationView(hydrantAnnotation: annotation as! HydrantAnnotation, reuseIdentifier: reuseIdentifier, hydrantImage: image!)
+                return hydrantAnnotationView
+            }
         }
-        
+    
         return nil
-        
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
