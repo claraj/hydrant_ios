@@ -44,12 +44,21 @@ class HydrantStore {
     }
     
     func archiveChanges() {
-        do {
-            let data = try NSKeyedArchiver.archivedData(withRootObject: hydrantUpdates, requiringSecureCoding: false)
-            try data.write(to: hydrantArchiveURL)
-            print("archived items to \(hydrantArchiveURL)")
-        } catch {
-            print("Error archiving items: \(error)")  // TODO handle this error !
-        }
+        
+        
+            do {
+                
+                if #available(iOS 11.0, *) {
+                    let data = try NSKeyedArchiver.archivedData(withRootObject: hydrantUpdates, requiringSecureCoding: false)
+                     try data.write(to: hydrantArchiveURL)
+                }
+                else {
+                    let data = NSKeyedArchiver.archivedData(withRootObject: hydrantUpdates)
+                     try data.write(to: hydrantArchiveURL)
+                }
+                print("archived items to \(hydrantArchiveURL)")
+            } catch {
+                print("Error archiving items: \(error)")  // TODO handle this error !
+            }
     }
 }

@@ -118,6 +118,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        // Optional - if you find this annoying, then remove this line, or
+        // implement a way to toggle automatic centering. 
         centerMapOnUserLocation()  // Follow user on map as they move
     }
     
