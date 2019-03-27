@@ -43,7 +43,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             imagePicker.sourceType = .savedPhotosAlbum
         }
         
-        imagePicker.delegate = self
         present(imagePicker, animated: true, completion: nil )
     }
     
